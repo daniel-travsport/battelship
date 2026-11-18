@@ -1,0 +1,275 @@
+/* Battleships — Team Wars. Dark naval theme shared by the player and GM dashboards. */
+
+:root {
+  --bg: #0b1824;
+  --panel: #102434;
+  --panel-2: #14304a;
+  --line: #234a66;
+  --text: #e3eef6;
+  --muted: #8fb0c6;
+  --accent: #4fc3f7;
+  --blue-team: #3d8bfd;
+  --red-team: #ff5468;
+  --ok: #3ddc84;
+  --off: #6b7c88;
+
+  /* Grid state colours (spec section 11). */
+  --water: #1b4764;
+  --ship: #2879a4;
+  --island: #668a45;
+  --hit-enemy: #d32f45;
+  --hit-own: #f044a0;
+  --miss: #e4c56b;
+  --sunk: #922033;
+  --vote: #f2d36b;
+  --legal: #5fd0ff;
+
+  --cell: clamp(20px, min(calc((100vw - 400px) / 27.5), calc((100vh - 250px) / 13)), 42px);
+  --gap: 8px;
+  --radius: 6px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+button, input { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 6px 12px; background: #081320; border-bottom: 1px solid var(--line);
+  min-height: 40px;
+}
+.topbar h1 { margin: 0; font-size: 16px; letter-spacing: .5px; white-space: nowrap; }
+.topbar h1 span { color: var(--accent); font-weight: 600; }
+.pill {
+  padding: 2px 10px; border-radius: 999px; font-weight: 700; font-size: 12px;
+  background: var(--panel-2); border: 1px solid var(--line); white-space: nowrap;
+}
+.pill.blue { background: var(--blue-team); border-color: var(--blue-team); color: #fff; }
+.pill.red { background: var(--red-team); border-color: var(--red-team); color: #fff; }
+.pill.warn { background: #b8860b; border-color: #b8860b; color: #fff; }
+.topbar .grow { flex: 1; }
+.conn { font-size: 12px; color: var(--muted); }
+.conn.bad { color: var(--red-team); font-weight: 700; }
+
+/* ---------- panels ---------- */
+.panel {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 8px;
+}
+h2 {
+  margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+}
+h2 .count { margin-left: auto; color: var(--text); letter-spacing: 0; text-transform: none; font-weight: 600; }
+.status { margin-top: 6px; padding: 6px 8px; background: var(--panel-2); border-radius: 4px; min-height: 30px; }
+.status strong { color: var(--vote); }
+.muted { color: var(--muted); }
+.error { color: #ff8a98; min-height: 1.2em; margin: 4px 0 0; }
+
+/* ---------- join screen ---------- */
+.join { display: grid; place-items: center; min-height: calc(100vh - 40px); padding: 16px; }
+.join .panel { width: min(420px, 100%); padding: 20px; }
+.join h2 { font-size: 14px; }
+.join form { display: flex; gap: 8px; margin-top: 8px; }
+.join input {
+  flex: 1; min-width: 0; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--line); background: var(--bg);
+}
+.btn {
+  padding: 7px 14px; border-radius: 4px; border: 1px solid var(--accent); background: #12507a; cursor: pointer;
+  font-weight: 600; white-space: nowrap;
+}
+.btn:hover:not(:disabled) { background: #1a6aa0; }
+.btn:disabled { opacity: 1; cursor: not-allowed; border-color: var(--line); background: var(--panel-2); color: var(--muted); }
+.btn.danger { border-color: var(--red-team); background: #6d1c28; }
+.btn.danger:hover:not(:disabled) { background: #8a2433; }
+
+/* ---------- player dashboard ---------- */
+.dash {
+  display: grid;
+  grid-template-columns: auto auto minmax(260px, 1fr);
+  gap: var(--gap);
+  padding: var(--gap);
+  height: calc(100vh - 41px);
+  align-items: start;
+}
+.col-info {
+  display: flex; flex-direction: column; gap: var(--gap);
+  height: 100%; min-height: 0; overflow: hidden;
+}
+.col-info .panel { display: flex; flex-direction: column; min-height: 0; }
+.col-info .grow-panel { flex: 1 1 0; }
+.scroll { overflow-y: auto; min-height: 0; flex: 1 1 auto; }
+
+/* ---------- grids ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: calc(var(--cell) * .7) repeat(12, var(--cell));
+  grid-auto-rows: var(--cell);
+  gap: 2px;
+  user-select: none;
+}
+.grid .gh {
+  display: grid; place-items: center; font-size: 11px; color: var(--muted); font-weight: 600;
+}
+.grid .gh:nth-child(-n+13) { align-items: end; }
+.cell {
+  position: relative;
+  display: grid; place-items: center;
+  width: var(--cell); height: var(--cell);
+  padding: 0; margin: 0;
+  border: 1px solid rgba(0, 0, 0, .35);
+  border-radius: 3px;
+  font-size: calc(var(--cell) * .3);
+  line-height: 1;
+  color: rgba(255, 255, 255, .55);
+  cursor: default;
+  opacity: 1;
+}
+.cell:disabled { opacity: 1; cursor: default; }
+.cell .lbl { pointer-events: none; }
+.cell .tally {
+  position: absolute; top: -5px; right: -5px; min-width: 15px; height: 15px; padding: 0 3px;
+  border-radius: 8px; background: var(--vote); color: #1a1a1a; font-size: 10px; font-weight: 800;
+  display: none; place-items: center; z-index: 2; line-height: 15px;
+}
+.cell.has-tally .tally { display: grid; }
+
+/* One background per state. All share the same specificity and only one is ever applied. */
+.cell.s-water { background: var(--water); }
+.cell.s-ship { background: var(--ship); color: rgba(255, 255, 255, .8); }
+.cell.s-pending { background: var(--ship); color: #fff; outline: 2px dashed var(--vote); outline-offset: -3px; }
+.cell.s-island { background: var(--island); color: #e8f5d0; font-size: calc(var(--cell) * .5); }
+.cell.s-hit-enemy { background: var(--hit-enemy); color: #fff; font-size: calc(var(--cell) * .55); font-weight: 900; }
+.cell.s-hit-own { background: var(--hit-own); color: #fff; font-size: calc(var(--cell) * .55); font-weight: 900; }
+.cell.s-sunk { background: var(--sunk); color: #ffd0d6; font-size: calc(var(--cell) * .55); font-weight: 900; }
+.cell.s-miss { background: var(--miss); color: #4a3b10; font-size: calc(var(--cell) * .6); font-weight: 900; }
+
+/* Interaction outlines never touch the background. */
+.cell.legal { cursor: pointer; box-shadow: inset 0 0 0 2px var(--legal); color: #fff; }
+.cell.legal:hover { box-shadow: inset 0 0 0 3px #fff; }
+.cell.preview { box-shadow: inset 0 0 0 3px var(--vote); }
+.cell.mine { box-shadow: inset 0 0 0 3px var(--vote), 0 0 6px 1px var(--vote); color: #fff; z-index: 1; }
+
+/* ---------- placement controls ---------- */
+.dirs { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.dir {
+  flex: 1 1 60px; position: relative; padding: 6px 4px; border-radius: 4px; font-weight: 700;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); cursor: not-allowed;
+}
+.dir.legal { border-color: var(--legal); color: #fff; background: #12507a; cursor: pointer; }
+.dir.legal:hover { background: #1a6aa0; }
+.dir.mine { border-color: var(--vote); box-shadow: 0 0 0 2px var(--vote); color: #fff; }
+.dir:disabled { opacity: 1; }
+.dir .tally {
+  position: absolute; top: -7px; right: -5px; min-width: 16px; height: 16px; border-radius: 8px;
+  background: var(--vote); color: #1a1a1a; font-size: 10px; font-weight: 800; line-height: 16px; padding: 0 3px;
+}
+.dir .tally:empty { display: none; }
+
+/* ---------- fleet status ---------- */
+.fleet { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.ship-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px;
+  background: var(--panel-2); border: 1px solid var(--line); font-size: 11px;
+}
+.ship-chip .pips { display: inline-flex; gap: 1px; }
+.ship-chip .pip { width: 6px; height: 8px; border-radius: 1px; background: var(--ship); }
+.ship-chip .pip.hit { background: var(--hit-own); }
+.ship-chip.enemy .pip { background: var(--muted); }
+.ship-chip.sunk { border-color: var(--sunk); color: #ffb3bd; text-decoration: line-through; }
+.ship-chip.sunk .pip { background: var(--sunk); }
+.ship-chip.unplaced { color: var(--muted); border-style: dashed; }
+.ship-chip.unplaced .pip { background: var(--line); }
+
+/* ---------- teammates ---------- */
+.roster { display: flex; flex-wrap: wrap; gap: 4px; }
+.mate {
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 7px; border-radius: 999px;
+  background: var(--panel-2); border: 1px solid var(--line); font-size: 12px; max-width: 100%;
+}
+.mate .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mate.me { border-color: var(--accent); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--off); flex: none; }
+.dot.on { background: var(--ok); box-shadow: 0 0 4px var(--ok); }
+
+/* ---------- feeds ---------- */
+.feed { list-style: none; margin: 0; padding: 0; }
+.feed li { padding: 4px 2px; border-bottom: 1px solid rgba(35, 74, 102, .6); word-wrap: break-word; }
+.feed li:last-child { border-bottom: 0; }
+.intel li .src { color: var(--vote); font-weight: 700; font-size: 11px; letter-spacing: .8px; }
+.intel li .ts, .log li .ts, .chat li .ts { color: var(--muted); font-size: 11px; margin-left: 4px; }
+.intel li .txt { font-style: italic; color: #cfe3f1; }
+.chat li .from { font-weight: 700; color: var(--accent); }
+.chat li.mine .from { color: var(--vote); }
+.log li { font-size: 12px; }
+.log li.private { color: var(--muted); }
+.chat-form { display: flex; gap: 6px; margin-top: 6px; }
+.chat-form input {
+  flex: 1; min-width: 0; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--line); background: var(--bg);
+}
+
+/* ---------- team status ---------- */
+.team-status { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.team-status .big { font-size: 14px; font-weight: 700; }
+
+/* ---------- game over ---------- */
+.overlay {
+  position: fixed; inset: 0; background: rgba(4, 10, 16, .78); display: grid; place-items: center; z-index: 50; padding: 16px;
+}
+.overlay .panel { text-align: center; padding: 24px 28px; max-width: 460px; }
+.overlay h2 { justify-content: center; font-size: 28px; color: #fff; letter-spacing: 2px; }
+.overlay h2.blue { color: var(--blue-team); }
+.overlay h2.red { color: var(--red-team); }
+.overlay p { margin: 6px 0; }
+
+/* ---------- legend ---------- */
+.legend { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; font-size: 11px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 4px; }
+.legend i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+.legend .s-water { background: var(--water); }
+.legend .s-ship { background: var(--ship); }
+.legend .s-island { background: var(--island); }
+.legend .s-hit-enemy { background: var(--hit-enemy); }
+.legend .s-hit-own { background: var(--hit-own); }
+.legend .s-miss { background: var(--miss); }
+.legend .s-sunk { background: var(--sunk); }
+
+/* ---------- Game Master ---------- */
+.host-dash { padding: var(--gap); display: grid; gap: var(--gap); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.controls label { display: inline-flex; gap: 4px; align-items: center; color: var(--muted); }
+.host-teams { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+.host-team h2.blue { color: var(--blue-team); }
+.host-team h2.red { color: var(--red-team); }
+.host-team .board-wrap { display: flex; gap: var(--gap); flex-wrap: wrap; align-items: flex-start; }
+.host-team .side { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.host-team .intel { max-height: 180px; overflow-y: auto; }
+.host-bottom { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
+.host-bottom .log { max-height: 220px; overflow-y: auto; }
+.host-dash { --cell: clamp(18px, min(calc((50vw - 300px) / 13), calc((100vh - 260px) / 13)), 34px); }
+.host-team .side .feed li { font-size: 12px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  :root { --cell: clamp(20px, calc((100vw - 60px) / 27.5), 34px); }
+  .dash { grid-template-columns: auto auto; height: auto; }
+  .col-info { grid-column: 1 / -1; height: auto; display: grid; grid-template-columns: 1fr 1fr; }
+  .col-info .scroll { max-height: 220px; }
+  .host-teams { grid-template-columns: 1fr; }
+  .host-dash { --cell: clamp(18px, calc((100vw - 60px) / 14), 34px); }
+}
+@media (max-width: 760px) {
+  :root { --cell: calc((100vw - 52px) / 12.9); }
+  .dash { grid-template-columns: 1fr; }
+  .col-info { grid-template-columns: 1fr; }
+  .grid { justify-content: center; }
+  .topbar h1 { font-size: 14px; }
+  .host-dash { --cell: calc((100vw - 52px) / 12.9); }
+}
