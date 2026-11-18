@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: battleships-team-wars
+    runtime: node
+    plan: free
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: HOST_KEY
+        sync: false # set the value in the Render dashboard; never commit it

@@ -1,0 +1,68 @@
+name: Test Battleships live game
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "local = a temporary isolated server inside this job. live = the deployed Render game (it will be RESET)."
+        type: choice
+        options:
+          - local
+          - live
+        default: local
+      live_url:
+        description: "URL of the live game (used only when target is live)"
+        type: string
+        default: "https://battleships-team-wars.onrender.com"
+      confirm_live_reset:
+        description: "Type RESET to allow the test to reset the live game"
+        type: string
+        default: ""
+      allow_active_reset:
+        description: "Also reset a game that is in progress with players online"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: battleships-live-test
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check and unit tests
+        run: |
+          npm run check
+          npm run test:unit
+
+      - name: Multiplayer integration test
+        env:
+          TARGET_URL: ${{ inputs.target == 'live' && inputs.live_url || '' }}
+          BATTLESHIPS_HOST_KEY: ${{ secrets.BATTLESHIPS_HOST_KEY }}
+          CONFIRM_LIVE_RESET: ${{ inputs.confirm_live_reset }}
+          ALLOW_ACTIVE_RESET: ${{ inputs.allow_active_reset }}
+          REPORT_PATH: test-report.json
+        run: node test/live-test.js
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: battleships-test-report
+          path: test-report.json
+          if-no-files-found: warn
