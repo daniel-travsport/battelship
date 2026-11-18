@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Battleships — Team Wars</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>⚓ Battleships <span>Team Wars</span></h1>
+    <span id="teamPill" class="pill" hidden></span>
+    <span id="phasePill" class="pill">Connecting…</span>
+    <span id="turnPill" class="pill" hidden></span>
+    <span class="grow"></span>
+    <span id="meName" class="muted"></span>
+    <span id="conn" class="conn">●</span>
+  </header>
+
+  <main id="joinView" class="join">
+    <div class="panel">
+      <h2>Join the game</h2>
+      <p class="muted">Enter a display name. You will be assigned to the Blue or Red team.</p>
+      <form id="joinForm" autocomplete="off">
+        <input id="nameInput" maxlength="24" placeholder="Display name" aria-label="Display name" required>
+        <button class="btn" type="submit">Join</button>
+      </form>
+      <p id="joinError" class="error" role="alert"></p>
+      <p id="joinInfo" class="muted"></p>
+    </div>
+  </main>
+
+  <main id="gameView" class="dash" hidden>
+    <section class="panel col-fleet" aria-labelledby="ownTitle">
+      <h2 id="ownTitle">Your Fleet <span class="count" id="ownCount"></span></h2>
+      <div id="ownGrid"></div>
+      <div id="placeStatus" class="status"></div>
+      <div id="dirs" class="dirs" hidden>
+        <button type="button" class="dir" data-dir="UP">▲ UP<span class="tally"></span></button>
+        <button type="button" class="dir" data-dir="DOWN">▼ DOWN<span class="tally"></span></button>
+        <button type="button" class="dir" data-dir="LEFT">◀ LEFT<span class="tally"></span></button>
+        <button type="button" class="dir" data-dir="RIGHT">▶ RIGHT<span class="tally"></span></button>
+      </div>
+      <div id="ownFleet" class="fleet"></div>
+    </section>
+
+    <section class="panel col-enemy" aria-labelledby="enemyTitle">
+      <h2 id="enemyTitle">Enemy Waters <span class="count" id="enemyCount"></span></h2>
+      <div id="enemyGrid"></div>
+      <div id="attackStatus" class="status"></div>
+      <div id="enemyFleet" class="fleet"></div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="s-water"></i>Water</span>
+        <span><i class="s-ship"></i>Your ship</span>
+        <span><i class="s-island"></i>Island</span>
+        <span><i class="s-hit-enemy"></i>Hit</span>
+        <span><i class="s-hit-own"></i>Hit on you</span>
+        <span><i class="s-miss"></i>Miss</span>
+        <span><i class="s-sunk"></i>Sunk</span>
+      </div>
+    </section>
+
+    <aside class="col-info">
+      <section class="panel">
+        <h2>Team status</h2>
+        <div id="teamStatus" class="team-status"></div>
+      </section>
+      <section class="panel">
+        <h2>Your Teammates <span class="count" id="onlineCount"></span></h2>
+        <div id="roster" class="roster"></div>
+      </section>
+      <section class="panel grow-panel">
+        <h2>Intelligence</h2>
+        <ul id="intel" class="feed intel scroll"></ul>
+      </section>
+      <section class="panel grow-panel">
+        <h2>Team chat</h2>
+        <ul id="chat" class="feed chat scroll" aria-live="polite"></ul>
+        <form id="chatForm" class="chat-form" autocomplete="off">
+          <input id="chatInput" maxlength="300" placeholder="Message your team" aria-label="Chat message">
+          <button class="btn" type="submit">Send</button>
+        </form>
+        <p id="chatError" class="error" role="alert" hidden></p>
+      </section>
+      <section class="panel grow-panel">
+        <h2>Battle log</h2>
+        <ul id="log" class="feed log scroll"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <div id="gameOver" class="overlay" hidden>
+    <div class="panel">
+      <h2 id="winTitle"></h2>
+      <p id="winLine"></p>
+      <p id="winDetail" class="muted"></p>
+      <button id="winClose" class="btn" type="button">View the final boards</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="shared.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

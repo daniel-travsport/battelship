@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Game Master — Battleships Team Wars</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>⚓ Battleships <span>Game Master</span></h1>
+    <span id="phasePill" class="pill">Not signed in</span>
+    <span id="turnPill" class="pill" hidden></span>
+    <span id="attackInfo" class="muted"></span>
+    <span class="grow"></span>
+    <span id="conn" class="conn">●</span>
+  </header>
+
+  <main id="authView" class="join">
+    <div class="panel">
+      <h2>Game Master sign-in</h2>
+      <form id="authForm" autocomplete="off">
+        <input id="keyInput" type="password" placeholder="Host key" aria-label="Host key" required>
+        <button class="btn" type="submit">Sign in</button>
+      </form>
+      <p id="authError" class="error" role="alert"></p>
+    </div>
+  </main>
+
+  <main id="hostView" class="host-dash" hidden>
+    <section class="panel controls">
+      <button id="btnStart" class="btn" type="button">Start game</button>
+      <button id="btnPause" class="btn" type="button">Pause</button>
+      <button id="btnResume" class="btn" type="button">Resume</button>
+      <span class="grow"></span>
+      <label><input id="removeAll" type="checkbox"> Remove all players on reset</label>
+      <button id="btnReset" class="btn danger" type="button">Reset game…</button>
+      <span id="ctlMsg" class="error" role="alert"></span>
+    </section>
+
+    <section id="winner" class="panel" hidden>
+      <h2 id="winnerText"></h2>
+    </section>
+
+    <div class="host-teams">
+      <section class="panel host-team" data-team="blue">
+        <h2 class="blue">Blue fleet <span class="count" data-f="online"></span></h2>
+        <div class="board-wrap">
+          <div data-f="grid"></div>
+          <div class="side">
+            <div data-f="roster" class="roster"></div>
+            <div data-f="progress" class="status"></div>
+            <div data-f="fleet" class="fleet"></div>
+            <h2>Intelligence for Blue</h2>
+            <ul data-f="intel" class="feed intel"></ul>
+          </div>
+        </div>
+      </section>
+      <section class="panel host-team" data-team="red">
+        <h2 class="red">Red fleet <span class="count" data-f="online"></span></h2>
+        <div class="board-wrap">
+          <div data-f="grid"></div>
+          <div class="side">
+            <div data-f="roster" class="roster"></div>
+            <div data-f="progress" class="status"></div>
+            <div data-f="fleet" class="fleet"></div>
+            <h2>Intelligence for Red</h2>
+            <ul data-f="intel" class="feed intel"></ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel host-bottom">
+      <h2>Battle log</h2>
+      <ul id="log" class="feed log"></ul>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="shared.js"></script>
+  <script src="host.js"></script>
+</body>
+</html>
