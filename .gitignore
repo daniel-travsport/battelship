@@ -1,0 +1,7 @@
+node_modules/
+.env
+.env.*
+test-report.json
+*.zip
+.DS_Store
+npm-debug.log*
